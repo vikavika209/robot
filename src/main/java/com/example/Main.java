@@ -1,32 +1,21 @@
 package com.example;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.*;
 
 public class Main {
     public static void main(String[] args) throws InterruptedException {
+        BlockingQueue<String> leftQueue = new ArrayBlockingQueue<String>(1);
+        BlockingQueue<String> rightQueue = new ArrayBlockingQueue<String>(1);
 
-        //Способ 1
+        Leg rightLeg = new Leg("Right", leftQueue, rightQueue);
+        Leg leftLeg = new Leg("Left", rightQueue, leftQueue);
 
-//        final Object lock = new Object();
-//
-//        Leg rightLeg = new Leg("right", lock);
-//        Leg leftLeg = new Leg("left", lock);
-//
-//        Thread threadLeft = new Thread(leftLeg);
-//        Thread threadRight = new Thread(rightLeg);
-//
-//        threadLeft.start();
-//        threadRight.start();
+        rightQueue.put("Go");
 
-        //Способ 2
+        rightLeg.fork();
+        leftLeg.fork();
 
-        String[] legs = {"right", "left"};
-        Leg robot = new Leg(legs);
+        rightLeg.join();
+        leftLeg.join();
 
-        ForkJoinPool forkJoinPool = new ForkJoinPool();
-        forkJoinPool.invoke(robot);
     }
 }
